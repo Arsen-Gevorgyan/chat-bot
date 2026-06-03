@@ -1,5 +1,4 @@
 const axios = require("axios");
-
 require("dotenv").config();
 
 const { App } = require("@slack/bolt");
@@ -10,98 +9,133 @@ const app = new App({
   socketMode: true
 });
 
+
 app.command("/dsb-catfact", async ({ ack, respond }) => {
   await ack();
 
   try {
-    const response = await axios.get("https://catfact.ninja/fact");
-    await respond({ text: `Cat Fact:\n${response.data.fact}` });
+    const response = await axios.get("https://catfact.ninja/fact", {
+      timeout: 5000
+    });
+
+    return await respond({
+      text: `🐱 Cat Fact:\n${response.data.fact}`
+    });
+
   } catch (err) {
-    await respond({ text: "Failed to fetch a cat fact." });
+    console.error(err);
+    return await respond({
+      text: "Failed to fetch a cat fact."
+    });
   }
 });
 
+
 app.command("/dsb-help", async ({ ack, respond }) => {
   await ack();
-  await respond({
+
+  return await respond({
     text:
 `Commands:
-/dsb-ping - Pong
-/dsb-sum - Sum number1 number2
-/dsb-bmi - Calculate BMI
-/dsb-dice - Rolling dice
-/dsb-help - Help`
+• /dsb-ping - Pong
+• /dsb-sum - Sum number1 number2
+• /dsb-bmi - Calculate BMI
+• /dsb-dice - Roll dice
+• /dsb-catfact - Random cat fact
+• /dsb-help - Help`
   });
 });
 
 app.command("/dsb-sum", async ({ command, ack, respond }) => {
-  try {
-    await ack();
+  await ack();
 
-    const args = command.text.trim().split(" ");
+  try {
+    const args = (command.text || "").trim().split(/\s+/);
 
     const num1 = Number(args[0]);
     const num2 = Number(args[1]);
 
     if (isNaN(num1) || isNaN(num2)) {
-      await respond({
+      return await respond({
         text: "Usage: /dsb-sum 5 10"
       });
-
-      return;
     }
 
-    const sum = num1 + num2;
-
-    await respond({
-      text: `Sum: ${sum}`
+    return await respond({
+      text: `Sum: ${num1 + num2}`
     });
 
   } catch (error) {
     console.error(error);
+    return await respond({
+      text: "Error occurred in /dsb-sum"
+    });
   }
 });
 
+
 app.command("/dsb-bmi", async ({ command, ack, respond }) => {
+  await ack();
+
   try {
-    await ack();
+    const args = (command.text || "").trim().split(/\s+/);
 
-    const args = command.text.trim().split(" ");
+    const weight = Number(args[0]);
+    const height = Number(args[1]);
 
-    const num1 = Number(args[0]);
-    const num2 = Number(args[1]);
-
-    if (isNaN(num1) || isNaN(num2)) {
-      await respond({
+    if (isNaN(weight) || isNaN(height) || height <= 0) {
+      return await respond({
         text: "Usage: /dsb-bmi 70 175"
       });
-
-      return;
     }
 
-    const bmi = num1 / (num2 / 100) ** 2;
+    const bmi = weight / (height / 100) ** 2;
 
-    await respond({
+    return await respond({
       text: `BMI: ${bmi.toFixed(2)}`
     });
 
   } catch (error) {
     console.error(error);
+    return await respond({
+      text: "Error occurred in /dsb-bmi"
+    });
   }
 });
 
+
 app.command("/dsb-dice", async ({ ack, respond }) => {
-    await ack();
+  await ack();
+
+  try {
     const dice = Math.floor(Math.random() * 6) + 1;
-    await respond(`You rolled ${dice}`);
+
+    return await respond({
+      text: `🎲 You rolled ${dice}`
+    });
+
+  } catch (error) {
+    console.error(error);
+    return await respond({
+      text: "Error rolling dice."
+    });
+  }
 });
 
+
 app.command("/dsb-ping", async ({ ack, respond }) => {
-    await ack();
-    await respond(`Pong`);
+  await ack();
+
+  return await respond({
+    text: "Pong 🏓"
+  });
 });
 
 (async () => {
-  await app.start();
-  console.log("bot is running!");
+  try {
+    await app.start();
+    console.log("⚡ Slack bot is running (Socket Mode)");
+  } catch (error) {
+    console.error("Failed to start bot:", error);
+  }
 })();
