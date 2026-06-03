@@ -10,7 +10,7 @@ const app = new App({
 });
 
 
-app.command("/dsb-catfact", async ({ ack, respond }) => {
+app.command("/asd-catfact", async ({ ack, respond }) => {
   await ack();
 
   try {
@@ -31,22 +31,22 @@ app.command("/dsb-catfact", async ({ ack, respond }) => {
 });
 
 
-app.command("/dsb-help", async ({ ack, respond }) => {
+app.command("/asd-help", async ({ ack, respond }) => {
   await ack();
 
   return await respond({
     text:
 `Commands:
-• /dsb-ping - Pong
-• /dsb-sum - Sum number1 number2
-• /dsb-bmi - Calculate BMI
-• /dsb-dice - Roll dice
-• /dsb-catfact - Random cat fact
-• /dsb-help - Help`
+• /asd-ping - Pong
+• /asd-sum - Sum number1 number2
+• /asd-bmi - Calculate BMI
+• /asd-dice - Roll dice
+• /asd-catfact - Random cat fact
+• /asd-help - Help`
   });
 });
 
-app.command("/dsb-sum", async ({ command, ack, respond }) => {
+app.command("/asd-sum", async ({ command, ack, respond }) => {
   await ack();
 
   try {
@@ -57,7 +57,7 @@ app.command("/dsb-sum", async ({ command, ack, respond }) => {
 
     if (isNaN(num1) || isNaN(num2)) {
       return await respond({
-        text: "Usage: /dsb-sum 5 10"
+        text: "Usage: /asd-sum 5 10"
       });
     }
 
@@ -68,13 +68,13 @@ app.command("/dsb-sum", async ({ command, ack, respond }) => {
   } catch (error) {
     console.error(error);
     return await respond({
-      text: "Error occurred in /dsb-sum"
+      text: "Error occurred in /asd-sum"
     });
   }
 });
 
 
-app.command("/dsb-bmi", async ({ command, ack, respond }) => {
+app.command("/asd-bmi", async ({ command, ack, respond }) => {
   await ack();
 
   try {
@@ -85,7 +85,7 @@ app.command("/dsb-bmi", async ({ command, ack, respond }) => {
 
     if (isNaN(weight) || isNaN(height) || height <= 0) {
       return await respond({
-        text: "Usage: /dsb-bmi 70 175"
+        text: "Usage: /asd-bmi 70 175"
       });
     }
 
@@ -98,13 +98,13 @@ app.command("/dsb-bmi", async ({ command, ack, respond }) => {
   } catch (error) {
     console.error(error);
     return await respond({
-      text: "Error occurred in /dsb-bmi"
+      text: "Error occurred in /asd-bmi"
     });
   }
 });
 
 
-app.command("/dsb-dice", async ({ ack, respond }) => {
+app.command("/asd-dice", async ({ ack, respond }) => {
   await ack();
 
   try {
@@ -123,7 +123,7 @@ app.command("/dsb-dice", async ({ ack, respond }) => {
 });
 
 
-app.command("/dsb-ping", async ({ ack, respond }) => {
+app.command("/asd-ping", async ({ ack, respond }) => {
   await ack();
 
   return await respond({
