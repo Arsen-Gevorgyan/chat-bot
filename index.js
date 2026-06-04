@@ -61,23 +61,48 @@ app.command("/asd-http", async ({ command, ack, respond }) => {
 
   let url = command.text.trim();
 
-if (!url) {
-  return await respond({
-    text: "Usage: /asd-http <url>"
-  });
-}
+  if (!url) {
+    return await respond({
+      text: "Usage: /asd-http <url>"
+    });
+  }
 
-if (!url.startsWith("http://") && !url.startsWith("https://")) {
-  url = `https://${url}`;
-}
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    url = `https://${url}`;
+  }
 
-try {
-  new URL(url);
-} catch {
-  return await respond({
-    text: "Invalid URL."
-  });
-}
+  try {
+    new URL(url);
+  } catch {
+    return await respond({
+      text: "Invalid URL."
+    });
+  }
+
+  try {
+    const start = Date.now();
+
+    const response = await axios.get(url, {
+      timeout: 5000,
+      validateStatus: () => true
+    });
+
+    const latency = Date.now() - start;
+
+    return await respond({
+      text:
+        `URL: ${url}\n` +
+        `Status: ${response.status} ${response.statusText}\n` +
+        `Latency: ${latency}ms`
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    return await respond({
+      text: `Request failed: ${err.message}`
+    });
+  }
 });
 
 app.command("/asd-help", async ({ ack, respond }) => {
