@@ -30,6 +30,66 @@ app.command("/asd-catfact", async ({ ack, respond }) => {
   }
 });
 
+app.command("/asd-bitcoin", async ({ ack, respond }) => {
+  await ack();
+
+  try {
+    const response = await axios.get("https://api.coindesk.com/v1/bpi/currentprice.json", {
+      timeout: 5000
+    });
+
+    const usd = response.data.bpi.USD.rate;
+    return await respond({
+      text: `Bitcoin price (USD): $${usd} `
+    });
+
+  } catch (err) {
+    console.error(err);
+    return await respond({
+      text: "Failed to fetch Bitcoin price."
+    });
+  }
+});
+
+app.command("/asd-http", async ({ command, ack, respond }) => {
+  await ack();
+
+  const url = command.text.trim();
+
+  if (!url){
+    return await respond({text: "Usage: /http <url>"});
+  }
+
+  try {
+    const start = Date.now();
+    try {
+      new URL(url);
+    } catch {
+      return await respond({
+      text: "Invalid URL."
+  });
+}
+    const response = await axios.get(url, {
+      timeout: 5000,
+      validateStatus: () => true
+    });
+
+    const latency = Date.now() - start;
+
+    await respond({
+      text: 
+        `URL: ${url}\n` +
+        `Status: ${response.status} ${response.statusText}\n` +
+        `Latency: ${latency}ms`
+    });
+
+  } catch (err) {
+    console.error(err);
+    await respond({
+      text: `Request failed: ${err.message}`
+    });
+  }
+});
 
 app.command("/asd-help", async ({ ack, respond }) => {
   await ack();
@@ -42,6 +102,9 @@ app.command("/asd-help", async ({ ack, respond }) => {
 • /asd-bmi - Calculate BMI
 • /asd-dice - Roll dice
 • /asd-catfact - Random cat fact
+• /asd-bitcoin - Bitcoin price
+• /asd-rect - Calculate Rectangle area
+• /asd-http - HTTP status checker
 • /asd-help - Help`
   });
 });
@@ -72,6 +135,34 @@ app.command("/asd-sum", async ({ command, ack, respond }) => {
     });
   }
 });
+
+app.command("/asd-rect", async ({ command, ack, respond }) => {
+  await ack();
+
+  try {
+    const args = (command.text || "").trim().split(/\s+/);
+
+    const num1 = Number(args[0]);
+    const num2 = Number(args[1]);
+
+    if (isNaN(num1) || isNaN(num2)) {
+      return await respond({
+        text: "Usage: /asd-rect 5 10"
+      });
+    }
+
+    return await respond({
+      text: `Area: ${num1 * num2}`
+    });
+
+  } catch (error) {
+    console.error(error);
+    return await respond({
+      text: "Error occurred in /asd-rect"
+    });
+  }
+});
+
 
 
 app.command("/asd-bmi", async ({ command, ack, respond }) => {
