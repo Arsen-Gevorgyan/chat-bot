@@ -34,17 +34,22 @@ app.command("/asd-bitcoin", async ({ ack, respond }) => {
   await ack();
 
   try {
-    const response = await axios.get("https://api.coindesk.com/v1/bpi/currentprice.json", {
-      timeout: 5000
-    });
+    const response = await axios.get(
+      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
+      {
+        timeout: 5000
+      }
+    );
 
-    const usd = response.data.bpi.USD.rate;
+    const price = response.data.bitcoin.usd;
+
     return await respond({
-      text: `Bitcoin price (USD): $${usd} `
+      text: `₿ Bitcoin price: $${price}`
     });
 
   } catch (err) {
     console.error(err);
+
     return await respond({
       text: "Failed to fetch Bitcoin price."
     });
@@ -54,41 +59,25 @@ app.command("/asd-bitcoin", async ({ ack, respond }) => {
 app.command("/asd-http", async ({ command, ack, respond }) => {
   await ack();
 
-  const url = command.text.trim();
+  let url = command.text.trim();
 
-  if (!url){
-    return await respond({text: "Usage: /http <url>"});
-  }
-
-  try {
-    const start = Date.now();
-    try {
-      new URL(url);
-    } catch {
-      return await respond({
-      text: "Invalid URL."
+if (!url) {
+  return await respond({
+    text: "Usage: /asd-http <url>"
   });
 }
-    const response = await axios.get(url, {
-      timeout: 5000,
-      validateStatus: () => true
-    });
 
-    const latency = Date.now() - start;
+if (!url.startsWith("http://") && !url.startsWith("https://")) {
+  url = `https://${url}`;
+}
 
-    await respond({
-      text: 
-        `URL: ${url}\n` +
-        `Status: ${response.status} ${response.statusText}\n` +
-        `Latency: ${latency}ms`
-    });
-
-  } catch (err) {
-    console.error(err);
-    await respond({
-      text: `Request failed: ${err.message}`
-    });
-  }
+try {
+  new URL(url);
+} catch {
+  return await respond({
+    text: "Invalid URL."
+  });
+}
 });
 
 app.command("/asd-help", async ({ ack, respond }) => {
