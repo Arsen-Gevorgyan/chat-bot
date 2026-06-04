@@ -56,35 +56,6 @@ app.command("/asd-bitcoin", async ({ ack, respond }) => {
   }
 });
 
-app.command("/asd-http", async ({ command, ack, respond }) => {
-  await ack();
-
-  let url = (command.text || "").trim();
-
-  if (!url) {
-    return await respond("Usage: /asd-http <url>");
-  }
-
-  // always normalize
-  if (!url.startsWith("http")) {
-    url = "https://" + url;
-  }
-
-  try {
-    const res = await axios.get(url, {
-      timeout: 5000,
-      validateStatus: () => true
-    });
-
-    return await respond(
-      `URL: ${url}\nStatus: ${res.status}`
-    );
-
-  } catch (err) {
-    return await respond("Request failed");
-  }
-});
-
 app.command("/asd-help", async ({ ack, respond }) => {
   await ack();
 
@@ -98,7 +69,6 @@ app.command("/asd-help", async ({ ack, respond }) => {
 • /asd-catfact - Random cat fact
 • /asd-bitcoin - Bitcoin price
 • /asd-rect - Calculate Rectangle area
-• /asd-http - HTTP status checker
 • /asd-help - Help`
   });
 });
