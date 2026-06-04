@@ -59,49 +59,29 @@ app.command("/asd-bitcoin", async ({ ack, respond }) => {
 app.command("/asd-http", async ({ command, ack, respond }) => {
   await ack();
 
-  let url = command.text.trim();
+  let url = (command.text || "").trim();
 
   if (!url) {
-    return await respond({
-      text: "Usage: /asd-http <url>"
-    });
+    return await respond("Usage: /asd-http <url>");
   }
 
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    url = `https://${url}`;
-  }
-
-  try {
-    new URL(url);
-  } catch {
-    return await respond({
-      text: "Invalid URL."
-    });
+  // always normalize
+  if (!url.startsWith("http")) {
+    url = "https://" + url;
   }
 
   try {
-    const start = Date.now();
-
-    const response = await axios.get(url, {
+    const res = await axios.get(url, {
       timeout: 5000,
       validateStatus: () => true
     });
 
-    const latency = Date.now() - start;
-
-    return await respond({
-      text:
-        `URL: ${url}\n` +
-        `Status: ${response.status} ${response.statusText}\n` +
-        `Latency: ${latency}ms`
-    });
+    return await respond(
+      `URL: ${url}\nStatus: ${res.status}`
+    );
 
   } catch (err) {
-    console.error(err);
-
-    return await respond({
-      text: `Request failed: ${err.message}`
-    });
+    return await respond("Request failed");
   }
 });
 
