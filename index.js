@@ -5,191 +5,97 @@ const { App } = require("@slack/bolt");
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  appToken: process.env.SLACK_APP_TOKEN,
-  socketMode: true
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  socketMode: false
 });
 
-
+// CAT FACT
 app.command("/asd-catfact", async ({ ack, respond }) => {
   await ack();
 
-  try {
-    const response = await axios.get("https://catfact.ninja/fact", {
-      timeout: 5000
-    });
-
-    return await respond({
-      text: `🐱 Cat Fact:\n${response.data.fact}`
-    });
-
-  } catch (err) {
-    console.error(err);
-    return await respond({
-      text: "Failed to fetch a cat fact."
-    });
-  }
+  const res = await axios.get("https://catfact.ninja/fact");
+  return respond(`🐱 ${res.data.fact}`);
 });
 
+// BITCOIN
 app.command("/asd-bitcoin", async ({ ack, respond }) => {
   await ack();
 
-  try {
-    const response = await axios.get(
-      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
-      {
-        timeout: 5000
-      }
-    );
+  const res = await axios.get(
+    "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
+  );
 
-    const price = response.data.bitcoin.usd;
-
-    return await respond({
-      text: `₿ Bitcoin price: $${price}`
-    });
-
-  } catch (err) {
-    console.error(err);
-
-    return await respond({
-      text: "Failed to fetch Bitcoin price."
-    });
-  }
+  return respond(`₿ $${res.data.bitcoin.usd}`);
 });
 
-app.command("/asd-help", async ({ ack, respond }) => {
+// PING
+app.command("/asd-ping", async ({ ack, respond }) => {
+  await ack();
+  return respond("Pong 🏓");
+});
+
+// SUM
+app.command("/asd-sum", async ({ ack, command, respond }) => {
   await ack();
 
-  return await respond({
-    text:
-`Commands:
-• /asd-ping - Pong
-• /asd-sum - Sum number1 number2
-• /asd-bmi - Calculate BMI
-• /asd-dice - Roll dice
-• /asd-catfact - Random cat fact
-• /asd-bitcoin - Bitcoin price
-• /asd-rect - Calculate Rectangle area
-• /asd-help - Help`
-  });
+  const [a, b] = (command.text || "").split(" ");
+  const x = Number(a);
+  const y = Number(b);
+
+  if (isNaN(x) || isNaN(y)) return respond("Usage: /asd-sum 5 10");
+
+  return respond(`Sum: ${x + y}`);
 });
 
-app.command("/asd-sum", async ({ command, ack, respond }) => {
+// BMI
+app.command("/asd-bmi", async ({ ack, command, respond }) => {
   await ack();
 
-  try {
-    const args = (command.text || "").trim().split(/\s+/);
+  const [w, h] = (command.text || "").split(" ");
+  const weight = Number(w);
+  const height = Number(h);
 
-    const num1 = Number(args[0]);
-    const num2 = Number(args[1]);
+  if (!weight || !height) return respond("Usage: /asd-bmi 70 175");
 
-    if (isNaN(num1) || isNaN(num2)) {
-      return await respond({
-        text: "Usage: /asd-sum 5 10"
-      });
-    }
-
-    return await respond({
-      text: `Sum: ${num1 + num2}`
-    });
-
-  } catch (error) {
-    console.error(error);
-    return await respond({
-      text: "Error occurred in /asd-sum"
-    });
-  }
+  const bmi = weight / (height / 100) ** 2;
+  return respond(`BMI: ${bmi.toFixed(2)}`);
 });
 
-app.command("/asd-rect", async ({ command, ack, respond }) => {
+// RECTANGLE
+app.command("/asd-rect", async ({ ack, command, respond }) => {
   await ack();
 
-  try {
-    const args = (command.text || "").trim().split(/\s+/);
-
-    const num1 = Number(args[0]);
-    const num2 = Number(args[1]);
-
-    if (isNaN(num1) || isNaN(num2)) {
-      return await respond({
-        text: "Usage: /asd-rect 5 10"
-      });
-    }
-
-    return await respond({
-      text: `Area: ${num1 * num2}`
-    });
-
-  } catch (error) {
-    console.error(error);
-    return await respond({
-      text: "Error occurred in /asd-rect"
-    });
-  }
+  const [a, b] = (command.text || "").split(" ");
+  return respond(`Area: ${Number(a) * Number(b)}`);
 });
 
-
-
-app.command("/asd-bmi", async ({ command, ack, respond }) => {
-  await ack();
-
-  try {
-    const args = (command.text || "").trim().split(/\s+/);
-
-    const weight = Number(args[0]);
-    const height = Number(args[1]);
-
-    if (isNaN(weight) || isNaN(height) || height <= 0) {
-      return await respond({
-        text: "Usage: /asd-bmi 70 175"
-      });
-    }
-
-    const bmi = weight / (height / 100) ** 2;
-
-    return await respond({
-      text: `BMI: ${bmi.toFixed(2)}`
-    });
-
-  } catch (error) {
-    console.error(error);
-    return await respond({
-      text: "Error occurred in /asd-bmi"
-    });
-  }
-});
-
-
+// DICE
 app.command("/asd-dice", async ({ ack, respond }) => {
   await ack();
 
-  try {
-    const dice = Math.floor(Math.random() * 6) + 1;
-
-    return await respond({
-      text: `🎲 You rolled ${dice}`
-    });
-
-  } catch (error) {
-    console.error(error);
-    return await respond({
-      text: "Error rolling dice."
-    });
-  }
+  const dice = Math.floor(Math.random() * 6) + 1;
+  return respond(`🎲 ${dice}`);
 });
 
-
-app.command("/asd-ping", async ({ ack, respond }) => {
+// HELP
+app.command("/asd-help", async ({ ack, respond }) => {
   await ack();
 
-  return await respond({
-    text: "Pong 🏓"
-  });
+  return respond(`
+Commands:
+/asd-ping
+/asd-sum 5 10
+/asd-bmi 70 175
+/asd-rect 5 10
+/asd-dice
+/asd-catfact
+/asd-bitcoin
+`);
 });
+
+// PUBLIC SERVER START
 (async () => {
-  try {
-    await app.start(3000);
-    console.log("⚡ Slack bot is running on port 3000");
-  } catch (error) {
-    console.error("Failed to start bot:", error);
-  }
+  const port = process.env.PORT || 3000;
+  await app.start(port);
+  console.log(`⚡ ALWAYS-ON BOT RUNNING ON PORT ${port}`);
 })();
