@@ -1,7 +1,7 @@
 {
   "name": "chat-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "I built and deployed a Slack bot on a Nest server that runs 24/7 using Node.js and systemd.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -16,5 +16,14 @@
     "@slack/bolt": "^4.7.3",
     "axios": "^1.17.0",
     "dotenv": "^17.4.2"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arsen-Gevorgyan/chat-bot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Arsen-Gevorgyan/chat-bot/issues"
+  },
+  "homepage": "https://github.com/Arsen-Gevorgyan/chat-bot#readme"
 }

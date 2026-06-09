@@ -185,11 +185,10 @@ app.command("/asd-ping", async ({ ack, respond }) => {
     text: "Pong 🏓"
   });
 });
-
 (async () => {
   try {
-    await app.start();
-    console.log("⚡ Slack bot is running (Socket Mode)");
+    await app.start(3000);
+    console.log("⚡ Slack bot is running on port 3000");
   } catch (error) {
     console.error("Failed to start bot:", error);
   }
