@@ -48,7 +48,7 @@ The bot is now fully deployed and runs continuously on the server with automatic
 
 Use the link below to install the Slack bot into your workspace:
 
-https://hackclub.enterprise.slack.com/archives/D0B8XCVRG6L
+https://hackclub.enterprise.slack.com/archives/C0B96454ZHR
 
 Screenshots:
 ![Screenshot 1](./1.png) 
